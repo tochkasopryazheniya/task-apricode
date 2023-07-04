@@ -1,4 +1,4 @@
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import s from './taskItem.module.scss';
 import Task from "../../../types/Task";
 import arrowRight from '../../../assets/img/arrowRight.svg';
@@ -8,17 +8,26 @@ import Checkbox from "../../SharedComponents/Checkbox/Checkbox";
 type TaskItemProps = {
     task: Task,
     extraPadding?: boolean,
-    isCheckedParent?: boolean
+    isChecked: boolean,
+    onCheck: (taskId: string, isChecked: boolean) => void;
 }
 
-const TaskItem = ({task, extraPadding, isCheckedParent}: TaskItemProps) => {
-    const [isChecked, setIsChecked] = useState(isCheckedParent ? isCheckedParent : false);
+const TaskItem = ({task, extraPadding, isChecked, onCheck}: TaskItemProps) => {
     const extraTasksRef = useRef<HTMLDivElement>(null);
     const arrowIconRef = useRef<HTMLImageElement>(null);
 
-    const onCheck = () => {
-        setIsChecked(!isChecked);
-    }
+    const [childChecked, setChildChecked] = useState(isChecked);
+
+    useEffect(() => {
+        setChildChecked(isChecked);
+    }, [isChecked]);
+
+    const onChildCheck = (childChecked: boolean) => {
+        setChildChecked(childChecked);
+        task.subtasks?.forEach((subtask) => {
+            onCheck(subtask.id, childChecked);
+        });
+    };
 
     const onToggleExtraTasks = () => {
         if (extraTasksRef.current && arrowIconRef.current) {
@@ -40,12 +49,13 @@ const TaskItem = ({task, extraPadding, isCheckedParent}: TaskItemProps) => {
                 <img ref={arrowIconRef} className={s.iconImg} src={arrowRight} alt="arrowUp"/>
                 <div className={s.title}>{task.title}</div>
                 <div className={s.checkbox}>
-                    <Checkbox isChecked={isChecked} onCheck={onCheck} id={task.id} sm={extraPadding}/>
+                    <Checkbox isChecked={childChecked} onCheck={() => onChildCheck(!childChecked)} id={task.id} sm={extraPadding}/>
                 </div>
             </div>
             <div className={s.extraTasks} ref={extraTasksRef}>
                 {task.subtasks && task.subtasks.length && task.subtasks.map(task => {
-                    return <TaskItem isCheckedParent={isChecked} task={task} extraPadding key={task.id}/>
+                    return <TaskItem onCheck={onCheck}
+                                     isChecked={childChecked} task={task} extraPadding key={task.id}/>
                 })}
             </div>
         </div>

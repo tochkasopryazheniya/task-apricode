@@ -3,15 +3,15 @@ import s from './checkbox.module.scss';
 
 type CheckboxProps = {
     isChecked: boolean,
-    onCheck: (event: React.ChangeEvent<HTMLInputElement>) => void,
+    onCheck: () => void,
     id: string,
     sm?: boolean
 }
 
-const Checkbox = ({isChecked, onCheck, id, sm}: CheckboxProps) => {
+const Checkbox = ({isChecked, id, sm, onCheck}: CheckboxProps) => {
     return (
         <>
-            <input checked={isChecked} className={s.input} onChange={onCheck} type="checkbox" id={id}/>
+            <input checked={isChecked} className={s.input} type="checkbox" id={id} onChange={onCheck}/>
             <label className={`${s.label} ${sm ? s.sm : ''}`} htmlFor={id}></label>
         </>
     );

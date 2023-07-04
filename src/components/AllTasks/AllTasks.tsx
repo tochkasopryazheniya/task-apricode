@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import s from './allTasks.module.scss';
 import TaskItem from "./TaskItem/TaskItem";
 import Task from "../../types/Task";
@@ -21,11 +21,21 @@ const tasksData: Task[] = [
 ]
 
 const AllTasks = () => {
+    const initialCheckedState: { [key: string]: boolean } = {};
+    const [checkedState, setCheckedState] = useState(initialCheckedState);
+
+
+    const onCheck = (taskId: string, isChecked: boolean) => {
+        setCheckedState((prevState) => ({
+            ...prevState,
+            [taskId]: isChecked,
+        }));
+    };
     return (
         <div className={s.tasksWrapper}>
             <div className={s.tasks}>
                 {tasksData.map(item => {
-                    return <TaskItem task={item} key={item.id}/>
+                    return <TaskItem isChecked={checkedState[item.id] || false} onCheck={onCheck} task={item} key={item.id}/>
                 })}
             </div>
             <div className={s.taskText}>
