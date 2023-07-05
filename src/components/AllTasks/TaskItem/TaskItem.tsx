@@ -4,6 +4,7 @@ import Task from "../../../types/Task";
 import arrowRight from '../../../assets/img/arrowRight.svg';
 import Checkbox from "../../SharedComponents/Checkbox/Checkbox";
 import Store from "../../../store/store";
+import {observer} from "mobx-react-lite";
 
 
 type TaskItemProps = {
@@ -69,4 +70,4 @@ const TaskItem = ({task, extraPadding, isChecked, onCheck}: TaskItemProps) => {
     );
 };
 
-export default TaskItem;
+export default observer(TaskItem);

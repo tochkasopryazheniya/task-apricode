@@ -8,6 +8,7 @@ import useInput from "../../../hooks/useInput";
 import useTextarea from "../../../hooks/useTextarea";
 import {v4} from "uuid";
 import {showSuccess} from "../../../utils/notifications";
+import Input from "../../SharedComponents/Input/Input";
 
 type ModalTypeProps = {
     isShown: boolean,
@@ -63,7 +64,10 @@ const Modal = ({isShown, onHide}: ModalTypeProps) => {
                         return <option key={task.id} value={task.id}>{task.title}</option>
                     })}
                 </select>
-                <input value={input.value} onChange={input.onChange} className={s.input} type="text" placeholder='Введите название задачи'/>
+
+                <div className={s.input}>
+                    <Input value={input.value} onChange={input.onChange} placeholder='Введите название задачи'/>
+                </div>
                 <textarea value={textarea.value} onChange={textarea.onChange} className={s.textarea} placeholder='Введите текст задачи'></textarea>
                 <Button onClick={onAddNewTask}>Добавить</Button>
             </div>

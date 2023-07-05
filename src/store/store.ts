@@ -1,6 +1,7 @@
 import {makeAutoObservable} from "mobx";
 import Task from "../types/Task";
 import {v4} from "uuid";
+import React from "react";
 
 type ActiveTask = {
     title: string,
@@ -11,6 +12,7 @@ class Store {
     activeTask: ActiveTask = {title: '', text: ''};
     allTasks: Task[] = [];
     tasksForDelete: string[] = [];
+    searchValue = '';
 
 
     setAllTasks = () => {
@@ -98,6 +100,10 @@ class Store {
     addNewTask = (parentId: string, subTask: Task) => {
         this.allTasks = this.addTask(this.allTasks, parentId, subTask);
         localStorage.setItem('tasks', JSON.stringify(this.allTasks))
+    }
+
+    setSearchValue = (event: React.ChangeEvent<HTMLInputElement>) => {
+        this.searchValue = event.target.value;
     }
 
     constructor() {

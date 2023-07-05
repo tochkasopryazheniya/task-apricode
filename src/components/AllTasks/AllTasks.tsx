@@ -7,11 +7,12 @@ import Store from "../../store/store";
 import Button from "../SharedComponents/Button/Button";
 import Modal from "./Modal/Modal";
 import {showSuccess} from "../../utils/notifications";
+import Task from "../../types/Task";
 
 
 
 const AllTasks = () => {
-    const {allTasks, tasksForDelete, deleteSelectedTasks, setAllTasks} = Store;
+    const {allTasks, tasksForDelete, deleteSelectedTasks, setAllTasks, searchValue} = Store;
     const initialCheckedState: { [key: string]: boolean } = {};
     const [checkedState, setCheckedState] = useState(initialCheckedState);
     const [isShownModal, setIsShownModal] = useState(false);
@@ -37,6 +38,45 @@ const AllTasks = () => {
         showSuccess('Выбранные задачи успешно удалены');
     }
 
+    const filterTasks = (items: Task[], searchText: string): Task[] => {
+        const filteredItems: Task[] = [];
+
+        items.forEach(item => {
+            if (item.title.toLowerCase().includes(searchText.toLowerCase())) {
+                filteredItems.push(item);
+            }
+
+            if (item.subtasks && item.subtasks.length) {
+                const filteredSubtasks = filterTasks(item.subtasks, searchText);
+
+                if (filteredSubtasks.length > 0) {
+                    filteredItems.push(...filteredSubtasks);
+                }
+            }
+        });
+
+        return filteredItems;
+    };
+
+    const renderTasks = () => {
+        if(searchValue) {
+            const filteredTasks: Task[] = filterTasks(allTasks, searchValue);
+            if(!filteredTasks.length) {
+                return <div>Задача не найдена</div>
+            }
+
+            return filteredTasks.map(item => {
+                return <TaskItem isChecked={checkedState[item.id] || false} onCheck={onCheck} task={item}
+                                 key={item.id}/>
+            })
+        }else {
+            return allTasks.map(item => {
+                return <TaskItem isChecked={checkedState[item.id] || false} onCheck={onCheck} task={item}
+                                 key={item.id}/>
+            })
+        }
+    }
+
 
     useEffect(() => {
         setAllTasks();
@@ -47,10 +87,7 @@ const AllTasks = () => {
             <Modal isShown={isShownModal} onHide={onHideModal}/>
             <div className={s.tasksWrapper}>
                 <div className={s.tasks}>
-                    {allTasks.map(item => {
-                        return <TaskItem isChecked={checkedState[item.id] || false} onCheck={onCheck} task={item}
-                                         key={item.id}/>
-                    })}
+                    {renderTasks()}
                 </div>
                 <div className={s.tasksInfo}>
                     <div className={s.btnBlock}>
