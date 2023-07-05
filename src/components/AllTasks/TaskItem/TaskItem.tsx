@@ -3,6 +3,7 @@ import s from './taskItem.module.scss';
 import Task from "../../../types/Task";
 import arrowRight from '../../../assets/img/arrowRight.svg';
 import Checkbox from "../../SharedComponents/Checkbox/Checkbox";
+import Store from "../../../store/store";
 
 
 type TaskItemProps = {
@@ -13,6 +14,7 @@ type TaskItemProps = {
 }
 
 const TaskItem = ({task, extraPadding, isChecked, onCheck}: TaskItemProps) => {
+    const {setActiveTask, setTasksForDelete} = Store;
     const extraTasksRef = useRef<HTMLDivElement>(null);
     const arrowIconRef = useRef<HTMLImageElement>(null);
 
@@ -26,7 +28,10 @@ const TaskItem = ({task, extraPadding, isChecked, onCheck}: TaskItemProps) => {
         setChildChecked(childChecked);
         task.subtasks?.forEach((subtask) => {
             onCheck(subtask.id, childChecked);
+            setTasksForDelete(subtask.id);
         });
+
+        setTasksForDelete(task.id);
     };
 
     const onToggleExtraTasks = () => {
@@ -41,6 +46,7 @@ const TaskItem = ({task, extraPadding, isChecked, onCheck}: TaskItemProps) => {
             }
         }
 
+        setActiveTask(task.text, task.title)
     }
 
     return (
@@ -49,11 +55,12 @@ const TaskItem = ({task, extraPadding, isChecked, onCheck}: TaskItemProps) => {
                 <img ref={arrowIconRef} className={s.iconImg} src={arrowRight} alt="arrowUp"/>
                 <div className={s.title}>{task.title}</div>
                 <div className={s.checkbox}>
-                    <Checkbox isChecked={childChecked} onCheck={() => onChildCheck(!childChecked)} id={task.id} sm={extraPadding}/>
+                    <Checkbox isChecked={childChecked} onCheck={() => onChildCheck(!childChecked)} id={task.id}
+                              sm={extraPadding}/>
                 </div>
             </div>
             <div className={s.extraTasks} ref={extraTasksRef}>
-                {task.subtasks && task.subtasks.length && task.subtasks.map(task => {
+                {task.subtasks && task.subtasks.length > 0 && task.subtasks.map(task => {
                     return <TaskItem onCheck={onCheck}
                                      isChecked={childChecked} task={task} extraPadding key={task.id}/>
                 })}
