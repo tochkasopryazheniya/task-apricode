@@ -28,7 +28,7 @@ input[type="checkbox"] {
   content: "";
   display: none;
   left: 9px;
-  top: 0;
+  top: -10px;
   position: absolute;
   width: 13px;
   height: 18px;
@@ -53,5 +53,5 @@ input[type="checkbox"] {
   width: 8px;
   height: 12px;
   left: 6px;
-  top: 5px
+  top: -7px;
 }

@@ -4,10 +4,10 @@ type UseInputProps = {
     initialValue: string;
 }
 
-const useInput = ({ initialValue }: UseInputProps) => {
+const useTextarea= ({ initialValue }: UseInputProps) => {
     const [value, setValue] = useState(initialValue);
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setValue(event.target.value);
     }
 
@@ -22,4 +22,4 @@ const useInput = ({ initialValue }: UseInputProps) => {
     };
 };
 
-export default useInput;
+export default useTextarea;

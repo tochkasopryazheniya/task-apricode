@@ -9,23 +9,33 @@ type ActiveTask = {
 
 class Store {
     activeTask: ActiveTask = {title: '', text: ''};
-    allTasks: Task[] = [
-        {
-            id: v4(),
-            text: 'Пройтись по всем аспектам Frontend разработки',
-            title: 'Frontend',
-            subtasks: [{id: v4(), title: 'Изучить React', text: 'Пройтись по всем аспектам React'}, {
-                id: v4(),
-                title: 'Изучить Mobx',
-                text: 'Понять суть State Manager Mobx',
-                subtasks: [{id: v4(), title: 'Изучить Actions', text: 'Понять как работаю actions в mobx'}]
-            }]
-        },
-        {id: v4(), title: 'Вторая задача', text: 'Sample text'},
-        {id: v4(), title: 'Третья задача', text: 'Sample text'}
-    ];
+    allTasks: Task[] = [];
     tasksForDelete: string[] = [];
 
+
+    setAllTasks = () => {
+        const tasksInLocalStorage = localStorage.getItem('tasks');
+
+        if (tasksInLocalStorage) {
+            this.allTasks = JSON.parse(tasksInLocalStorage);
+        } else {
+            this.allTasks = [
+                {
+                    id: v4(),
+                    text: 'Пройтись по всем аспектам Frontend разработки',
+                    title: 'Frontend',
+                    subtasks: [{id: v4(), title: 'Изучить React', text: 'Пройтись по всем аспектам React'}, {
+                        id: v4(),
+                        title: 'Изучить Mobx',
+                        text: 'Понять суть State Manager Mobx',
+                        subtasks: [{id: v4(), title: 'Изучить Actions', text: 'Понять как работаю actions в mobx'}]
+                    }]
+                },
+                {id: v4(), title: 'Вторая задача', text: 'Sample text'},
+                {id: v4(), title: 'Третья задача', text: 'Sample text'}
+            ]
+        }
+    }
 
     setActiveTask = (text: string, title: string) => {
         this.activeTask = {text, title}
@@ -43,6 +53,7 @@ class Store {
         this.tasksForDelete = [];
     }
 
+    //По идее функции deleteTasks и addTask надо куда-то вынести, потому что это утилитные функции и напрямую не меняют стор
     deleteTasks = (taskArr: Task[], idsForDelete: string[]) => {
         return taskArr.filter((task) => {
             if (idsForDelete.includes(task.id)) {
@@ -54,10 +65,39 @@ class Store {
         });
     }
 
+    addTask = (tasks: Task[], parentId: string, newSubTask: Task) => {
+        if(parentId === '0') {
+            tasks.push(newSubTask);
+            return tasks;
+        }
+
+        const updatedTasks: Task[] = [];
+        const addSubtask = (task: Task) => {
+            if (task.id === parentId) {
+                task.subtasks = task.subtasks ? [...task.subtasks, newSubTask] : [newSubTask];
+            } else if (task.subtasks) {
+                task.subtasks = task.subtasks.map(addSubtask);
+            }
+            return task;
+        }
+
+        tasks.forEach((task) => {
+            updatedTasks.push(addSubtask(task));
+        });
+
+        return updatedTasks;
+    }
+
     deleteSelectedTasks = () => {
         this.allTasks = this.deleteTasks(this.allTasks, this.tasksForDelete);
         this.setActiveTask('', '');
         this.resetTasksForDelete();
+        localStorage.setItem('tasks', JSON.stringify(this.allTasks));
+    }
+
+    addNewTask = (parentId: string, subTask: Task) => {
+        this.allTasks = this.addTask(this.allTasks, parentId, subTask);
+        localStorage.setItem('tasks', JSON.stringify(this.allTasks))
     }
 
     constructor() {
