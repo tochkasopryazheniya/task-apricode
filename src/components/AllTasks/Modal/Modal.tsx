@@ -7,7 +7,7 @@ import Store from "../../../store/store";
 import useInput from "../../../hooks/useInput";
 import useTextarea from "../../../hooks/useTextarea";
 import {v4} from "uuid";
-import {showSuccess} from "../../../utils/notifications";
+import {showError, showSuccess} from "../../../utils/notifications";
 import Input from "../../SharedComponents/Input/Input";
 
 type ModalTypeProps = {
@@ -44,6 +44,16 @@ const Modal = ({isShown, onHide}: ModalTypeProps) => {
     }
 
     const onAddNewTask = () => {
+        if(!input.value) {
+            showError('Поле заголовок задачи обязательно для заполнения');
+            return;
+        }
+
+        if(!textarea.value) {
+            showError('Поле текст задачи обязателен для заполнения');
+            return;
+        }
+
         const subTask = {title: input.value, text: textarea.value, id: v4()};
         addNewTask(selectedOption, subTask);
         input.reset();
