@@ -50,7 +50,7 @@ const Modal = ({isShown, onHide}: ModalTypeProps) => {
         }
 
         if(!textarea.value) {
-            showError('Поле текст задачи обязателен для заполнения');
+            showError('Поле текст задачи обязательно для заполнения');
             return;
         }
 
